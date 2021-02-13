@@ -56,6 +56,34 @@ source("API_key.R")
 ## __Exercise 3: Interacting with the API - the basics__
 
 ```{r API_requests}
+response <- GET("https://app.ticketmaster.com/discovery/v2/venues.json?",
+                  query=list(apikey=API_key,
+                             countryCode="DE",
+                             locale="*"))
 
+status_code(response)
+
+json <- jsonlite::fromJSON(content(x=response, as = "text"))
+
+venues <- json$`_embedded`$venues
+
+venues_data <- 0
+
+venues_data$name <- venues$name
+venues_data$city <- venues$city$name
+venues_data$postalCode <- venues$postalCode
+venues_data$address <- venues$address$line1
+venues_data$url <- venues$url
+venues_data$longitude <- as.double(venues$location$longitude)
+venues_data$latitude <- as.double(venues$location$latitude)
+
+venues_data <- as.data.frame(venues_data)
+
+venues_data <- venues_data[,-1]
+
+glimpse(venues_data)
 
 ```
+
+
+
