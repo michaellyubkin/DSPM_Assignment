@@ -1,12 +1,17 @@
 ---
-title: "Lyubkin_Michael_AssignmentV"
-author: "Michael Lyubkin"
-date: "13 2 2021"
-output: html_document
+title: "__Solutions for Assignment V: GitHub and the ticketmaster.com API__"
+author: "__DS400 Data Science Project Management WS 20/21__"
+date: "February 13, 2021"
+output: 
+  html_document:
+    toc: true
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+I worked together with Lana Kern (Student ID: 5395819), Martin Scheerer
+(Student ID: 5631373) and Anton Höhl (Student ID: 5637078). I hereby assure that
+my submission is in line with the *Code of Conduct* outlined on the lecture slides.
 
-
+## __Exercise 1: Geospatial data__
