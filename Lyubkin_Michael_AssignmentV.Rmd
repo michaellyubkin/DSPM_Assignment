@@ -27,11 +27,35 @@ rm(list = ls())  # clear workspace
 
 knitr::opts_knit$set(root.dir = "C:/Users/Lenovo/Desktop/Uni/Data Science Project Management/Assignments/Assignment5/DSPM_Assignment")
 
+# Install relevant packages if needed
+
+if (!require("tidyverse")) install.packages("tidyverse")
+if (!require("httr")) install.packages("httr")
+if (!require("rlist")) install.packages("rlist")
+if (!require("jsonlite")) install.packages("jsonlite")
+if (!require("maps")) install.packages("maps")
+
+# Load the respective packages
+
+library(tidyverse)
+library(httr)
+library(rlist)
+library(jsonlite)
+library(maps)
+
 ```
 
 ## __Exercise 2: Getting to know the API__
 
 ```{r source_API_key}
 source("API_key.R")
+
+```
+
+
+## __Exercise 3: Interacting with the API - the basics__
+
+```{r API_requests}
+
 
 ```
