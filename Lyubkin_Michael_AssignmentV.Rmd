@@ -97,8 +97,9 @@ size_500 <- 500
 
 all_venues <- data.frame()
 
+pages <- pages + 1
 
-for (i in 0:25) {
+for (i in 0:pages) {
   res_venues <- GET("https://app.ticketmaster.com/discovery/v2/venues.json?", 
                     query = list(apikey = API_key,
                                  countryCode = "DE",
@@ -165,6 +166,126 @@ ggplot() +
   coord_quickmap() +
   geom_point(data = map_data_venues, aes(x = long, y = lat), size = 0.5) +
   labs(title = "Event locations across Germany", 
+       caption = "Source: ticketmaster.com") + 
+  theme(title = element_text(size=8, face='bold'),
+        plot.caption = element_text(face = "italic"))
+
+
+```
+
+## __Exercise 6: Event locations in other countries__
+
+```{r exercise_3}
+
+response <- GET("https://app.ticketmaster.com/discovery/v2/venues.json?",
+                  query=list(apikey=API_key,
+                             countryCode="CZ",
+                             locale="*"))
+
+status_code(response)
+
+json <- jsonlite::fromJSON(content(x=response, as = "text"))
+
+venues <- json$`_embedded`$venues
+
+venues_data <- 0
+
+venues_data$name <- venues$name
+venues_data$city <- venues$city$name
+venues_data$postalCode <- venues$postalCode
+venues_data$address <- venues$address$line1
+venues_data$url <- venues$url
+venues_data$longitude <- as.double(venues$location$longitude)
+venues_data$latitude <- as.double(venues$location$latitude)
+
+venues_data <- as.data.frame(venues_data)
+
+venues_data <- venues_data[,-1]
+
+glimpse(venues_data)
+
+venues_data$longitude[venues_data$longitude==0] <- NA
+venues_data$latitude[venues_data$latitude==0] <- NA
+
+```
+
+```{r exercise_4}
+
+n <- as.numeric(json[['page']][['totalElements']])
+pages <- floor(n/500)
+
+remainder <- n-500*floor(n/500)
+
+size_500 <- 500
+
+all_venues <- data.frame()
+
+pages <- pages + 1
+
+for (i in 0:pages) {
+  res_venues <- GET("https://app.ticketmaster.com/discovery/v2/venues.json?", 
+                    query = list(apikey = API_key,
+                                 countryCode = "CZ",
+                                 locale="*",
+                                 page   = i,
+                                 size=size_500))
+  
+  json_all <- jsonlite::fromJSON(content(x=res_venues, as = "text"))
+  
+  venues_all <- json_all$`_embedded`$venues
+  
+  venues_data_all <- tibble(
+    name= character(length(venues_all$name)),
+    city=character(length(venues_all$name)),
+    postalCode=character(length(venues_all$name)),
+    address=character(length(venues_all$name)),
+    url=character(length(venues_all$name)),
+    longitude=character(length(venues_all$name)),
+    latitude=character(length(venues_all$name)))
+  
+  venues_data_all$name <- venues_all$name
+  venues_data_all$city <- venues_all$city$name
+  venues_data_all$postalCode <- venues_all$postalCode
+  venues_data_all$address <- venues_all$address$line1
+  venues_data_all$url <- venues_all$url
+  venues_data_all$longitude <- as.double(venues_all$location$longitude)
+  venues_data_all$latitude <- as.double(venues_all$location$latitude)   
+
+  
+  all_venues <- rbind(all_venues, venues_data_all)
+  
+  
+  Sys.sleep(2)
+}
+
+```
+
+```{r preparing_data_map}
+
+map_data_venues <- all_venues
+
+map_data_venues$longitude[map_data_venues$longitude==0] <- NA
+map_data_venues$latitude[map_data_venues$latitude==0] <- NA
+
+map_data_venues <- map_data_venues %>%
+  filter(name !="TEST Venue Product Support" & name !="Divadlo Na Orlí")
+
+sum(is.na(map_data_venues$long))
+sum(is.na(map_data_venues$lat))
+
+
+```
+
+```{r map_sweden}
+ggplot() + 
+  geom_polygon(
+        aes(x = long, y = lat, group = group), 
+        data = map_data("world", region = "Czech Republic"),
+        fill = "grey90",color = "black") +
+  theme_void() + 
+  coord_quickmap() +
+  geom_point(data = map_data_venues, aes(x = longitude, y = latitude), size = 0.5) +
+  labs(title = "Event locations across Czech Republic", 
        caption = "Source: ticketmaster.com") + 
   theme(title = element_text(size=8, face='bold'),
         plot.caption = element_text(face = "italic"))
