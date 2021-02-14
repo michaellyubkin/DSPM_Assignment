@@ -55,7 +55,7 @@ source("API_key.R")
 
 ## __Exercise 3: Interacting with the API - the basics__
 
-```{r API_requests}
+```{r API_requests_first_page}
 response <- GET("https://app.ticketmaster.com/discovery/v2/venues.json?",
                   query=list(apikey=API_key,
                              countryCode="DE",
@@ -85,5 +85,54 @@ glimpse(venues_data)
 
 ```
 
+## __Exercise 4: Interacting with the API - advanced__
+
+```{r all_pages}
+n <- as.numeric(json[['page']][['totalElements']])
+pages <- floor(n/500)
+
+remainder <- n-500*floor(n/500)
+
+size_500 <- 500
+
+all_venues <- data.frame()
+
+
+for (i in 0:25) {
+  res_venues <- GET("https://app.ticketmaster.com/discovery/v2/venues.json?", 
+                    query = list(apikey = API_key,
+                                 countryCode = "DE",
+                                 locale="*",
+                                 page   = i,
+                                 size=size_500))
+  
+  json_all <- jsonlite::fromJSON(content(x=res_venues, as = "text"))
+  
+  venues_all <- json_all$`_embedded`$venues
+  
+  venues_data_all <- tibble(
+    name= character(length(venues_all$name)),
+    city=character(length(venues_all$name)),
+    postalCode=character(length(venues_all$name)),
+    address=character(length(venues_all$name)),
+    url=character(length(venues_all$name)),
+    longitude=character(length(venues_all$name)),
+    latitude=character(length(venues_all$name)))
+  
+  venues_data_all$name <- venues_all$name
+  venues_data_all$city <- venues_all$city$name
+  venues_data_all$postalCode <- venues_all$postalCode
+  venues_data_all$address <- venues_all$address$line1
+  venues_data_all$url <- venues_all$url
+  venues_data_all$longitude <- as.double(venues_all$location$longitude)
+  venues_data_all$latitude <- as.double(venues_all$location$latitude)   
+
+  
+  all_venues <- rbind(all_venues, venues_data_all)
+  
+  
+  Sys.sleep(2)
+}
+```
 
 
