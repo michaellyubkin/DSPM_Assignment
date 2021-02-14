@@ -136,3 +136,38 @@ for (i in 0:25) {
 ```
 
 
+## __Exercise 5: Visualizing the extracted data__
+
+```{r preparing_for_map}
+
+map_data_venues <- all_venues
+
+map_data_venues$long <- ifelse(between(map_data_venues$longitude, 5.866944, 15.043611), 
+                          map_data_venues$longitude, NA)
+
+map_data_venues$lat <- ifelse(between(map_data_venues$latitude, 47.271679, 55.0846), 
+                          map_data_venues$latitude, NA)
+
+sum(is.na(map_data_venues$long))
+sum(is.na(map_data_venues$lat))
+
+```
+
+
+```{r map}
+
+ggplot() + 
+  geom_polygon(
+        aes(x = long, y = lat, group = group), 
+        data = map_data("world", region = "Germany"),
+        fill = "grey90",color = "black") +
+  theme_void() + 
+  coord_quickmap() +
+  geom_point(data = map_data_venues, aes(x = long, y = lat), size = 0.5) +
+  labs(title = "Event locations across Germany", 
+       caption = "Source: ticketmaster.com") + 
+  theme(title = element_text(size=8, face='bold'),
+        plot.caption = element_text(face = "italic"))
+
+
+```
