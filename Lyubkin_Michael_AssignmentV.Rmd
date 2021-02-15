@@ -20,7 +20,7 @@ First I use ``opts_knit$set(root.dir = "")`` from the ``knitr`` package to set a
 working directory that will not cause problems in RMarkdown. Secondly, I clear my
 workspace and load ( if needed) the relevant R packages that I need for the assignment.
 
-```{r general_setup}
+```{r general_setup, warning=F, message=F}
 rm(list = ls())  # clear workspace
 
 # Setting my working directory in RMarkdown with the knitr package, instead of setwd() to not get any type of inconsistencies.
@@ -54,6 +54,11 @@ https://github.com/michaellyubkin/DSPM_Assignment
 
 
 ## __Exercise 2: Getting to know the API__
+
+I treat the API key as a secret token by creating a separate R file that cointains the API key. With the base function ``source()``, I can simply import that inforamtion without explicitly showing it in the main file. 
+
+Furthermore, the API key should not be seen on a public Github repository, therefore I include it in the  _.gitignore_ text document. The exact name of the ignorable file as well as the correct file ending should be stated within that document. Thta is exactly what I did to secure the information of my API key.
+
 
 ```{r source_API_key}
 source("API_key.R")
