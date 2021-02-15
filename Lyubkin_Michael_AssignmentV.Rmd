@@ -275,7 +275,7 @@ sum(is.na(map_data_venues$lat))
 
 ```
 
-After cutting the ,,worng" points, I write the code for map. Almost all lines were already given, I solely added the geom_point() argument with the geospatial information.
+After cutting the ,,worng" points, I write the code for the map. Almost all lines were already given, I solely added the geom_point() argument with the geospatial information.
 
 ```{r map_germany, warning=F}
 
@@ -308,7 +308,7 @@ The only adjustemnts that I have made were:
 2. For the Czech Republic, I manually cut of the points where the longitude and latitude infromation that seemed to be wrong
 3. For the Map code, I changed the reghion from "Germany" to "Czech Republic".
 
-```{r exercise_3_cz}
+```{r exercise_3_cz, warning=F}
 
 response <- GET("https://app.ticketmaster.com/discovery/v2/venues.json?",
                   query=list(apikey=API_key,
@@ -410,7 +410,9 @@ map_data_venues <- map_data_venues %>%
 
 ```
 
-```{r map_czech_republic, warning=F}
+The map of all venues in the Czech Republic looks like this:
+
+```{r map_czech_republic, warning=F, echo=F}
 ggplot() + 
   geom_polygon(
         aes(x = long, y = lat, group = group), 
