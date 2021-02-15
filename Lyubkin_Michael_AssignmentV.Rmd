@@ -16,7 +16,7 @@ my submission is in line with the *Code of Conduct* outlined on the lecture slid
 
 ### __General Setup__
 
-irst I use ``opts_knit$set(root.dir = "")`` from the ``knitr`` package to set a 
+First I use ``opts_knit$set(root.dir = "")`` from the ``knitr`` package to set a 
 working directory that will not cause problems in RMarkdown. Secondly, I clear my
 workspace and load ( if needed) the relevant R packages that I need for the assignment.
 
@@ -44,6 +44,14 @@ library(jsonlite)
 library(maps)
 
 ```
+
+## __Exercise 1: Setting up a new GitHub repository__
+
+All the necessary 
+
+The project's repository can be found on Github under the following Link:
+https://github.com/michaellyubkin/DSPM_Assignment
+
 
 ## __Exercise 2: Getting to know the API__
 
