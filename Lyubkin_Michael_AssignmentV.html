@@ -454,41 +454,13 @@ knitr::opts_knit$set(root.dir = &quot;C:/Users/Lenovo/Desktop/Uni/Data Science P
 
 # Install relevant packages if needed
 
-if (!require(&quot;tidyverse&quot;)) install.packages(&quot;tidyverse&quot;)</code></pre>
-<pre><code>## Loading required package: tidyverse</code></pre>
-<pre><code>## Warning: package &#39;tidyverse&#39; was built under R version 4.0.2</code></pre>
-<pre><code>## -- Attaching packages -------------------------------------------------------------------------------------------------------------------------------------- tidyverse 1.3.0 --</code></pre>
-<pre><code>## v ggplot2 3.3.2     v purrr   0.3.4
-## v tibble  3.0.1     v dplyr   1.0.0
-## v tidyr   1.1.0     v stringr 1.4.0
-## v readr   1.3.1     v forcats 0.5.0</code></pre>
-<pre><code>## Warning: package &#39;ggplot2&#39; was built under R version 4.0.2</code></pre>
-<pre><code>## -- Conflicts ----------------------------------------------------------------------------------------------------------------------------------------- tidyverse_conflicts() --
-## x dplyr::filter() masks stats::filter()
-## x dplyr::lag()    masks stats::lag()</code></pre>
-<pre class="r"><code>if (!require(&quot;httr&quot;)) install.packages(&quot;httr&quot;)</code></pre>
-<pre><code>## Loading required package: httr</code></pre>
-<pre><code>## Warning: package &#39;httr&#39; was built under R version 4.0.3</code></pre>
-<pre class="r"><code>if (!require(&quot;rlist&quot;)) install.packages(&quot;rlist&quot;)</code></pre>
-<pre><code>## Loading required package: rlist</code></pre>
-<pre><code>## Warning: package &#39;rlist&#39; was built under R version 4.0.3</code></pre>
-<pre class="r"><code>if (!require(&quot;jsonlite&quot;)) install.packages(&quot;jsonlite&quot;)</code></pre>
-<pre><code>## Loading required package: jsonlite</code></pre>
-<pre><code>## Warning: package &#39;jsonlite&#39; was built under R version 4.0.2</code></pre>
-<pre><code>## 
-## Attaching package: &#39;jsonlite&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:purrr&#39;:
-## 
-##     flatten</code></pre>
-<pre class="r"><code>if (!require(&quot;maps&quot;)) install.packages(&quot;maps&quot;)</code></pre>
-<pre><code>## Loading required package: maps</code></pre>
-<pre><code>## Warning: package &#39;maps&#39; was built under R version 4.0.3</code></pre>
-<pre><code>## 
-## Attaching package: &#39;maps&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:purrr&#39;:
-## 
-##     map</code></pre>
-<pre class="r"><code># Load the respective packages
+if (!require(&quot;tidyverse&quot;)) install.packages(&quot;tidyverse&quot;) # Generally needed
+if (!require(&quot;httr&quot;)) install.packages(&quot;httr&quot;)  # For exercise 3
+if (!require(&quot;rlist&quot;)) install.packages(&quot;rlist&quot;)  # For exercise 3
+if (!require(&quot;jsonlite&quot;)) install.packages(&quot;jsonlite&quot;) # For exercise 3
+if (!require(&quot;maps&quot;)) install.packages(&quot;maps&quot;) # For exercise 5
+
+# Load the respective packages
 
 library(tidyverse)
 library(httr)
@@ -498,7 +470,7 @@ library(maps)</code></pre>
 </div>
 <div id="exercise-1-setting-up-a-new-github-repository" class="section level2">
 <h2><strong>Exercise 1: Setting up a new GitHub repository</strong></h2>
-<p>All the necessary</p>
+<p>All the necessary steps have been executed.</p>
 <p>The project’s repository can be found on Github under the following Link: <a href="https://github.com/michaellyubkin/DSPM_Assignment" class="uri">https://github.com/michaellyubkin/DSPM_Assignment</a></p>
 </div>
 <div id="exercise-2-getting-to-know-the-api" class="section level2">
@@ -509,33 +481,64 @@ library(maps)</code></pre>
 </div>
 <div id="exercise-3-interacting-with-the-api---the-basics" class="section level2">
 <h2><strong>Exercise 3: Interacting with the API - the basics</strong></h2>
-<pre class="r"><code>response &lt;- GET(&quot;https://app.ticketmaster.com/discovery/v2/venues.json?&quot;,
+<p>The neccessary packages have been loaded in the general setup and not in this section. I prefer it to be at the beginning, as I think it is more organised and easy to understand for the reader.</p>
+<pre class="r"><code># I perform a GET request that searches for event venues in Germany. The abbreviation that is use to retrive information from Germany is the argument countryCode=&quot;DE&quot;.
+# It is important to set the argument locale = &quot;*&quot; to match all locales.
+
+response &lt;- GET(&quot;https://app.ticketmaster.com/discovery/v2/venues.json?&quot;,
                   query=list(apikey=API_key,
                              countryCode=&quot;DE&quot;,
                              locale=&quot;*&quot;))
 
+# When working with API&#39;s it is always important to check whether the GET request was succesfull.
+# This is why I use function status_code().
+
 status_code(response)</code></pre>
 <pre><code>## [1] 200</code></pre>
-<pre class="r"><code>json &lt;- jsonlite::fromJSON(content(x=response, as = &quot;text&quot;))
+<pre class="r"><code># The status code is 200, which tells us that our GET request ran without problems.
+
+# I extract the content from the response variable with the function content() asnd specifiying the argument as=&quot;text. Furthermore I need to parse this from json format to a R list.
+# For this purpose, I use the fromJSON() function from the jsonlite package.
+
+json &lt;- jsonlite::fromJSON(content(x=response, as = &quot;text&quot;))
+
+# The retrived object is a List of 3. One list is called _embedded. The other two Lists are called _links and page. In the _embedded List, there is a datframe venues that holds 19 columns and 20 rows. This is exactly what we wanted for our exercise. 
+
+# To get our asked information about venues in Germany, I simply use $ to get the information from that List.
 
 venues &lt;- json$`_embedded`$venues
 
-venues_data &lt;- 0
+# As the given data frame has 19 columns, buit we need only 7 columns, I create a new data frame venue_data.
 
-venues_data$name &lt;- venues$name</code></pre>
-<pre><code>## Warning in venues_data$name &lt;- venues$name: Wandle linke Seite in eine Liste um</code></pre>
-<pre class="r"><code>venues_data$city &lt;- venues$city$name
-venues_data$postalCode &lt;- venues$postalCode
-venues_data$address &lt;- venues$address$line1
-venues_data$url &lt;- venues$url
-venues_data$longitude &lt;- as.double(venues$location$longitude)
-venues_data$latitude &lt;- as.double(venues$location$latitude)
+venue_data &lt;- 0
 
-venues_data &lt;- as.data.frame(venues_data)
+# The data frame venues_data should have the respective columns from the venues data frame. Fir this step it is highly important to use the $ sign multiple times. Some variables show a value of NULL if only use with one $ sign.
 
-venues_data &lt;- venues_data[,-1]
+venue_data$name &lt;- venues$name
+venue_data$city &lt;- venues$city$name
+venue_data$postalCode &lt;- venues$postalCode
+venue_data$address &lt;- venues$address$line1
+venue_data$url &lt;- venues$url
 
-glimpse(venues_data)</code></pre>
+# The longitude and latitude columns should not be a in a character format but instead of dbl format.
+
+venue_data$longitude &lt;- as.double(venues$location$longitude) 
+venue_data$latitude &lt;- as.double(venues$location$latitude)
+
+# Venues_data is still a List of 8 but should be a datframe with 7 columns.
+
+# I transform it form List to a data fraem with the as.data.frame() function.
+
+venue_data &lt;- as.data.frame(venue_data)
+
+# The transformation causes R to add one column X0 which is useless for our excercise.
+# I remove it to have the desired data frame.
+
+venue_data &lt;- venue_data[,-1]
+
+# The resulting data frame takes on the following form:
+
+glimpse(venue_data)</code></pre>
 <pre><code>## Rows: 20
 ## Columns: 7
 ## $ name       &lt;chr&gt; &quot;Gruenspan&quot;, &quot;Philharmonie (Großer Saal)&quot;, &quot;Beatpol&quot;, &quot;M...
@@ -548,16 +551,46 @@ glimpse(venues_data)</code></pre>
 </div>
 <div id="exercise-4-interacting-with-the-api---advanced" class="section level2">
 <h2><strong>Exercise 4: Interacting with the API - advanced</strong></h2>
-<pre class="r"><code>n &lt;- as.numeric(json[[&#39;page&#39;]][[&#39;totalElements&#39;]])
+<p>Check the API documentation under the section Venue Search. How can you request the venues from the remaining results pages?</p>
+<p>I write a <code>for</code> loop that iterates through the pages and I write a <code>GET()</code> request for all venues not just the first page with 20 venues.</p>
+<pre class="r"><code>#Retrive information from the json file that shows me the total number of values.
+
+n &lt;- as.numeric(json[[&#39;page&#39;]][[&#39;totalElements&#39;]])
+n</code></pre>
+<pre><code>## [1] 12238</code></pre>
+<p>There are 12238 venues in Germany. This can be also seen on the website of the API.</p>
+<p>In order to understand how I should code my <code>for</code> loop, I first need to understand how many iterations the <code>for</code> loop is going to have.</p>
+<pre class="r"><code># I divide the number of venues trough 500 pages. I experiminted with how much venues can be retrieved per iteration and 500 is the largest it can go without
+# causing errors.
+
 pages &lt;- floor(n/500)
+pages </code></pre>
+<pre><code>## [1] 24</code></pre>
+<pre class="r"><code># 24 full pages can be retrieved
 
+# Of course 24*500= 12000 yields only 12000 venues, but we know there are 12238 venues.
+
+# Caluclatin the remaining pages which should account to 238 venues!
 remainder &lt;- n-500*floor(n/500)
-
+remainder</code></pre>
+<pre><code>## [1] 238</code></pre>
+<p>I tried multiple <code>for</code> loops also in combination with the <code>list.stack()</code> function. However, when writing <code>for</code> loops, I need to pay attention to multiple things. First, it needs to be computationally efficient, just as we discussed in Assignment 3. Secondly, for loops should be easily understood by other readers and therefore as easy as possible and the code should not be too long to avoid erros.</p>
+<p>For this task, I went with a <code>for</code> loop that is not computationally efficient, as with <code>rbind()</code> it constantly needs to rearrange the size of the resulting data frame. I tried it with the <code>list.stack()</code> function that would allow me to pre-specifiy a data frame with the correct rows and columns, so that the only thing I needed to do, was filling the rows. But sadly, I was not able to correctlly code that <code>for</code> loop.</p>
+<p>Instead, I will use <code>rbind()</code> function which is less compuationally efficient, but for my taks, commpuationally acceptable and the resulting <code>for</code> loop is short and easy understandable and iterates relatively quick nonetheless.</p>
+<p>If I had a more compuationally complex task, I would stick with the <code>list.stack()</code> function and try it with this function.</p>
+<p>But, for exercise 4, the following <code>for</code> loop is sufficent.</p>
+<pre class="r"><code># Creating a size_500 object, so it can used as a argument in the GET() function. This allows us to get 500 venues per page.
 size_500 &lt;- 500
+
+# Creating a empty dataframe that will be merged with the resulting venues.
 
 all_venues &lt;- data.frame()
 
+# As I use the rbind() function, it is unneccessary to distinguish betwenn full pages and the remainding venues. Therefore I need to iterate through 25 pages, whereby the last page only consists of 238 venues.
+
 pages &lt;- pages + 1
+
+# Adding the size argument and setting it to 500, and I add the page argument, as I want to iteate through all pages.
 
 for (i in 0:pages) {
   res_venues &lt;- GET(&quot;https://app.ticketmaster.com/discovery/v2/venues.json?&quot;, 
@@ -570,6 +603,8 @@ for (i in 0:pages) {
   json_all &lt;- jsonlite::fromJSON(content(x=res_venues, as = &quot;text&quot;))
   
   venues_all &lt;- json_all$`_embedded`$venues
+  
+  # Creating a dataframe, with the length of the respective venues.
   
   venues_data_all &lt;- tibble(
     name= character(length(venues_all$name)),
@@ -587,17 +622,58 @@ for (i in 0:pages) {
   venues_data_all$url &lt;- venues_all$url
   venues_data_all$longitude &lt;- as.double(venues_all$location$longitude)
   venues_data_all$latitude &lt;- as.double(venues_all$location$latitude)   
-
   
+  # Using the rbind() function to bind the resulting data frame with our empty datframe in the first iteration. In the second iteration, it will have 500 rows which will be binded to the 500 rows of the second iteration. This process repeats itself until we hit the 25th page.
+    
   all_venues &lt;- rbind(all_venues, venues_data_all)
   
+  # Setting Sys.sleep() to 2 seconds to avoid sening to many requests per second. This is in line with the respective API laws.
   
   Sys.sleep(2)
 }</code></pre>
+<p>The resulting dataframe does not have the name <em>venue_data</em> as in the exercise solution. This is beacuse <em>venue_data</em> is already a name for the resulting data frame in exercise 3.</p>
+<p>The data frame <code>all_venues</code> takes on the following form:</p>
+<pre class="r"><code>glimpse(all_venues)</code></pre>
+<pre><code>## Rows: 12,238
+## Columns: 7
+## $ name       &lt;chr&gt; &quot;Gruenspan&quot;, &quot;Philharmonie (Großer Saal)&quot;, &quot;Beatpol&quot;, &quot;M...
+## $ city       &lt;chr&gt; &quot;Hamburg&quot;, &quot;Berlin&quot;, &quot;Dresden&quot;, &quot;Ludwigsburg&quot;, &quot;Berlin&quot;,...
+## $ postalCode &lt;chr&gt; &quot;22767&quot;, &quot;10785&quot;, &quot;01157&quot;, &quot;71638&quot;, &quot;12435&quot;, &quot;79108&quot;, &quot;7...
+## $ address    &lt;chr&gt; &quot;Grosse Freiheit 58&quot;, &quot;Herbert-von-Karajan-Straße 1&quot;, &quot;A...
+## $ url        &lt;chr&gt; &quot;http://www.ticketmaster.de/venue/287155&quot;, &quot;https://www....
+## $ longitude  &lt;dbl&gt; 9.958075, 13.368960, 13.674710, 9.182400, 13.420540, 7.8...
+## $ latitude   &lt;dbl&gt; 53.55188, 52.51007, 51.06498, 48.89121, 52.49945, 48.015...</code></pre>
+<pre class="r"><code>head(all_venues, 5)</code></pre>
+<pre><code>## # A tibble: 5 x 7
+##   name      city    postalCode address     url                longitude latitude
+##   &lt;chr&gt;     &lt;chr&gt;   &lt;chr&gt;      &lt;chr&gt;       &lt;chr&gt;                  &lt;dbl&gt;    &lt;dbl&gt;
+## 1 Gruenspan Hamburg 22767      Grosse Fre~ http://www.ticket~      9.96     53.6
+## 2 Philharm~ Berlin  10785      Herbert-vo~ https://www.ticke~     13.4      52.5
+## 3 Beatpol   Dresden 01157      Altbriesni~ https://www.ticke~     13.7      51.1
+## 4 MHP Arena Ludwig~ 71638      Schwieberd~ https://www.ticke~      9.18     48.9
+## 5 Festsaal~ Berlin  12435      Am Flutgra~ https://www.ticke~     13.4      52.5</code></pre>
+<pre class="r"><code>tail(all_venues,5)</code></pre>
+<pre><code>## # A tibble: 5 x 7
+##   name        city    postalCode address   url                longitude latitude
+##   &lt;chr&gt;       &lt;chr&gt;   &lt;chr&gt;      &lt;chr&gt;     &lt;chr&gt;                  &lt;dbl&gt;    &lt;dbl&gt;
+## 1 GARAGE      SARREB~ 66111      BLEICHST~ http://www.ticket~        NA       NA
+## 2 EVENTGELAN~ LOSHEI~ 66679      Zum Stau~ http://www.ticket~        NA       NA
+## 3 ARENA de T~ TRIER   54292      FORTH WO~ http://www.ticket~        NA       NA
+## 4 VHS-ZENTRU~ SARREB~ 66111      AM SCHLO~ http://www.ticket~        NA       NA
+## 5 IKS-WERKST~ GOTTEL~ 66287      ZUM SCHA~ http://www.ticket~        NA       NA</code></pre>
 </div>
 <div id="exercise-5-visualizing-the-extracted-data" class="section level2">
 <h2><strong>Exercise 5: Visualizing the extracted data</strong></h2>
-<pre class="r"><code>map_data_venues &lt;- all_venues
+<p>In order to create the map of all venues in germany, I need to first, delete all the longitude and latidude information that seems to be false. To ensure that we only show the venues that are located in germany, I need to cut off points that are outsie the extrem points of longitude and latitude in germany.</p>
+<pre class="r"><code># First, I create a copy of my all_venues dataset with the name map_data_venues.
+
+map_data_venues &lt;- all_venues
+
+# In order to only keep the longitude and latitude information that is correct and lies in Germany, I use the between() function. 
+# I create two new variables: long and lat to match the names of the code for the map that were given in the assignment.
+
+# If the longitude lies in between the given extreme points, then there are added to our mnap_data_venues data frame as they seem to have the correct longitude and latitude information.
+# If they do not lie inbetween the extreme points, there are assumed to be wrong as are coded as NA!
 
 map_data_venues$long &lt;- ifelse(between(map_data_venues$longitude, 5.866944, 15.043611), 
                           map_data_venues$longitude, NA)
@@ -605,10 +681,13 @@ map_data_venues$long &lt;- ifelse(between(map_data_venues$longitude, 5.866944, 1
 map_data_venues$lat &lt;- ifelse(between(map_data_venues$latitude, 47.271679, 55.0846), 
                           map_data_venues$latitude, NA)
 
+# Check how many NA#s I have got:
+
 sum(is.na(map_data_venues$long))</code></pre>
 <pre><code>## [1] 4390</code></pre>
 <pre class="r"><code>sum(is.na(map_data_venues$lat))</code></pre>
 <pre><code>## [1] 4389</code></pre>
+<p>After cutting the ,,worng&quot; points, I write the code for map. Almost all lines were already given, I solely added the geom_point() argument with the geospatial information.</p>
 <pre class="r"><code>ggplot() + 
   geom_polygon(
         aes(x = long, y = lat, group = group), 
@@ -626,6 +705,14 @@ sum(is.na(map_data_venues$long))</code></pre>
 </div>
 <div id="exercise-6-event-locations-in-other-countries" class="section level2">
 <h2><strong>Exercise 6: Event locations in other countries</strong></h2>
+<p>In exercise 6, I needed to repeat exercises 2-5, but for another country. I chose the Czech Republic. For the solution of exercise 6, I could change the name of every object and therefore get all objects for the Czech Republic.</p>
+<p>However, all objects are names the same as in exercise 2 to exercise 5!</p>
+<p>The only adjustemnts that I have made were:</p>
+<ol style="list-style-type: decimal">
+<li>Setting the countryCode=“CZ” for the first <code>GET()</code> request and the <code>for</code> loop.</li>
+<li>For the Czech Republic, I manually cut of the points where the longitude and latitude infromation that seemed to be wrong</li>
+<li>For the Map code, I changed the reghion from “Germany” to “Czech Republic”.</li>
+</ol>
 <pre class="r"><code>response &lt;- GET(&quot;https://app.ticketmaster.com/discovery/v2/venues.json?&quot;,
                   query=list(apikey=API_key,
                              countryCode=&quot;CZ&quot;,

@@ -277,7 +277,7 @@ sum(is.na(map_data_venues$lat))
 
 After cutting the ,,worng" points, I write the code for map. Almost all lines were already given, I solely added the geom_point() argument with the geospatial information.
 
-```{r map_germany}
+```{r map_germany, warning=F}
 
 ggplot() + 
   geom_polygon(
@@ -308,7 +308,7 @@ The only adjustemnts that I have made were:
 2. For the Czech Republic, I manually cut of the points where the longitude and latitude infromation that seemed to be wrong
 3. For the Map code, I changed the reghion from "Germany" to "Czech Republic".
 
-```{r exercise_3}
+```{r exercise_3_cz}
 
 response <- GET("https://app.ticketmaster.com/discovery/v2/venues.json?",
                   query=list(apikey=API_key,
@@ -342,7 +342,7 @@ venues_data$latitude[venues_data$latitude==0] <- NA
 
 ```
 
-```{r exercise_4}
+```{r exercise_4_cz}
 
 n <- as.numeric(json[['page']][['totalElements']])
 pages <- floor(n/500)
@@ -393,23 +393,24 @@ for (i in 0:pages) {
 
 ```
 
-```{r preparing_data_map}
+```{r preparing_data_map_cz}
 
 map_data_venues <- all_venues
+
+# Some fiels had the longitude and latitude of 0. These fiels seem to be incorrect and should be treated as amissing value.
 
 map_data_venues$longitude[map_data_venues$longitude==0] <- NA
 map_data_venues$latitude[map_data_venues$latitude==0] <- NA
 
+# Instead of using the extreme points that are listed on Wikipedia, I manually deleted all the rows that seemed to be inconsistent
+# with the other longitude's and latitude's.
+
 map_data_venues <- map_data_venues %>%
   filter(name !="TEST Venue Product Support" & name !="Divadlo Na Orlí")
 
-sum(is.na(map_data_venues$long))
-sum(is.na(map_data_venues$lat))
-
-
 ```
 
-```{r map_sweden}
+```{r map_czech_republic, warning=F}
 ggplot() + 
   geom_polygon(
         aes(x = long, y = lat, group = group), 
