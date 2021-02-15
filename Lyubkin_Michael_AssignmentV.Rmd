@@ -29,11 +29,11 @@ knitr::opts_knit$set(root.dir = "C:/Users/Lenovo/Desktop/Uni/Data Science Projec
 
 # Install relevant packages if needed
 
-if (!require("tidyverse")) install.packages("tidyverse")
-if (!require("httr")) install.packages("httr")
-if (!require("rlist")) install.packages("rlist")
-if (!require("jsonlite")) install.packages("jsonlite")
-if (!require("maps")) install.packages("maps")
+if (!require("tidyverse")) install.packages("tidyverse") # Generally needed
+if (!require("httr")) install.packages("httr")  # For exercise 3
+if (!require("rlist")) install.packages("rlist")  # For exercise 3
+if (!require("jsonlite")) install.packages("jsonlite") # For exercise 3
+if (!require("maps")) install.packages("maps") # For exercise 5
 
 # Load the respective packages
 
@@ -47,7 +47,7 @@ library(maps)
 
 ## __Exercise 1: Setting up a new GitHub repository__
 
-All the necessary 
+All the necessary steps have been executed.
 
 The project's repository can be found on Github under the following Link:
 https://github.com/michaellyubkin/DSPM_Assignment
@@ -68,33 +68,67 @@ source("API_key.R")
 
 ## __Exercise 3: Interacting with the API - the basics__
 
-```{r API_requests_first_page}
+The neccessary packages have been loaded in the general setup and not in this section. I prefer it to be at the beginning, as I think it is more organised and
+easy to understand for the reader.
+
+```{r API_requests_first_page, warning=F}
+# I perform a GET request that searches for event venues in Germany. The abbreviation that is use to retrive information from Germany is the argument countryCode="DE".
+# It is important to set the argument locale = "*" to match all locales.
+
 response <- GET("https://app.ticketmaster.com/discovery/v2/venues.json?",
                   query=list(apikey=API_key,
                              countryCode="DE",
                              locale="*"))
 
+# When working with API's it is always important to check whether the GET request was succesfull.
+# This is why I use function status_code().
+
 status_code(response)
+
+# The status code is 200, which tells us that our GET request ran without problems.
+
+# I extract the content from the response variable with the function content() asnd specifiying the argument as="text. Furthermore I need to parse this from json format to a R list.
+# For this purpose, I use the fromJSON() function from the jsonlite package.
 
 json <- jsonlite::fromJSON(content(x=response, as = "text"))
 
+# The retrived object is a List of 3. One list is called _embedded. The other two Lists are called _links and page. In the _embedded List, there is a datframe venues that holds 19 columns and 20 rows. This is exactly what we wanted for our exercise. 
+
+# To get our asked information about venues in Germany, I simply use $ to get the information from that List.
+
 venues <- json$`_embedded`$venues
 
-venues_data <- 0
+# As the given data frame has 19 columns, buit we need only 7 columns, I create a new data frame venue_data.
 
-venues_data$name <- venues$name
-venues_data$city <- venues$city$name
-venues_data$postalCode <- venues$postalCode
-venues_data$address <- venues$address$line1
-venues_data$url <- venues$url
-venues_data$longitude <- as.double(venues$location$longitude)
-venues_data$latitude <- as.double(venues$location$latitude)
+venue_data <- 0
 
-venues_data <- as.data.frame(venues_data)
+# The data frame venues_data should have the respective columns from the venues data frame. Fir this step it is highly important to use the $ sign multiple times. Some variables show a value of NULL if only use with one $ sign.
 
-venues_data <- venues_data[,-1]
+venue_data$name <- venues$name
+venue_data$city <- venues$city$name
+venue_data$postalCode <- venues$postalCode
+venue_data$address <- venues$address$line1
+venue_data$url <- venues$url
 
-glimpse(venues_data)
+# The longitude and latitude columns should not be a in a character format but instead of dbl format.
+
+venue_data$longitude <- as.double(venues$location$longitude) 
+venue_data$latitude <- as.double(venues$location$latitude)
+
+# Venues_data is still a List of 8 but should be a datframe with 7 columns.
+
+# I transform it form List to a data fraem with the as.data.frame() function.
+
+venue_data <- as.data.frame(venue_data)
+
+# The transformation causes R to add one column X0 which is useless for our excercise.
+# I remove it to have the desired data frame.
+
+venue_data <- venue_data[,-1]
+
+# The resulting data frame takes on the following form:
+
+glimpse(venue_data)
 
 ```
 
