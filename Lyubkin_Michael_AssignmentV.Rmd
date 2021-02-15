@@ -134,17 +134,65 @@ glimpse(venue_data)
 
 ## __Exercise 4: Interacting with the API - advanced__
 
-```{r all_pages}
+Check the API documentation under the section Venue Search. How can you request the venues from
+the remaining results pages?
+
+I write a ``for`` loop that iterates through the pages and I write a ``GET()`` request for all venues not just the first page with 20 venues.
+
+```{r count_all_venues}
+#Retrive information from the json file that shows me the total number of values.
+
 n <- as.numeric(json[['page']][['totalElements']])
+n
+
+```
+
+There are 12238 venues in Germany. This can be also seen on the website of the API. 
+
+In order to understand how I should code my ``for`` loop, I first need to understand how many iterations the ``for`` loop is going to have.
+
+```{r preparing_for_loop}
+# I divide the number of venues trough 500 pages. I experiminted with how much venues can be retrieved per iteration and 500 is the largest it can go without
+# causing errors.
+
 pages <- floor(n/500)
+pages 
 
+# 24 full pages can be retrieved
+
+# Of course 24*500= 12000 yields only 12000 venues, but we know there are 12238 venues.
+
+# Caluclatin the remaining pages which should account to 238 venues!
 remainder <- n-500*floor(n/500)
+remainder
 
+```
+
+I tried multiple ``for`` loops also in combination with the ``list.stack()`` function. However, when writing ``for`` loops, I need to pay attention to multiple things.
+First, it needs to be computationally efficient, just as we discussed in Assignment 3. Secondly, for loops should be easily understood by other readers and therefore as easy as possible and
+the code should not be too long to avoid erros.
+
+For this task, I went with a ``for`` loop that is not computationally efficient, as with ``rbind()`` it constantly needs to rearrange the size of the resulting data frame. I tried it with the  ``list.stack()`` function that would allow me to pre-specifiy a data frame with the correct rows and columns, so that the only thing I needed to do, was filling the rows. But sadly, I was not able to correctlly code that ``for`` loop.
+
+Instead, I will use ``rbind()`` function which is less compuationally efficient, but for my taks, commpuationally acceptable and the resulting ``for`` loop is short and easy understandable and iterates relatively quick nonetheless.
+
+If I had a more compuationally complex task, I would stick with the ``list.stack()`` function and try it with this function.
+
+But, for exercise 4, the following ``for`` loop is sufficent.
+
+```{r for_loop_all_venues}
+# Creating a size_500 object, so it can used as a argument in the GET() function. This allows us to get 500 venues per page.
 size_500 <- 500
+
+# Creating a empty dataframe that will be merged with the resulting venues.
 
 all_venues <- data.frame()
 
+# As I use the rbind() function, it is unneccessary to distinguish betwenn full pages and the remainding venues. Therefore I need to iterate through 25 pages, whereby the last page only consists of 238 venues.
+
 pages <- pages + 1
+
+# Adding the size argument and setting it to 500, and I add the page argument, as I want to iteate through all pages.
 
 for (i in 0:pages) {
   res_venues <- GET("https://app.ticketmaster.com/discovery/v2/venues.json?", 
@@ -157,6 +205,8 @@ for (i in 0:pages) {
   json_all <- jsonlite::fromJSON(content(x=res_venues, as = "text"))
   
   venues_all <- json_all$`_embedded`$venues
+  
+  # Creating a dataframe, with the length of the respective venues.
   
   venues_data_all <- tibble(
     name= character(length(venues_all$name)),
@@ -174,15 +224,27 @@ for (i in 0:pages) {
   venues_data_all$url <- venues_all$url
   venues_data_all$longitude <- as.double(venues_all$location$longitude)
   venues_data_all$latitude <- as.double(venues_all$location$latitude)   
-
   
+  # Using the rbind() function to bind the resulting data frame with our empty datframe in the first iteration. In the second iteration, it will have 500 rows which will be binded to the 500 rows of the second iteration. This process repeats itself until we hit the 25th page.
+    
   all_venues <- rbind(all_venues, venues_data_all)
   
+  # Setting Sys.sleep() to 2 seconds to avoid sening to many requests per second. This is in line with the respective API laws.
   
   Sys.sleep(2)
 }
 ```
 
+The resulting dataframe does not have the name _venue_data_ as in the exercise solution. This is beacuse _venue_data_ is already a name for the resulting data frame in exercise 3.
+
+The data frame ``all_venues`` takes on the following form:
+
+```{r glimpse_all_venues}
+glimpse(all_venues)
+head(all_venues, 5)
+tail(all_venues,5)
+
+```
 
 ## __Exercise 5: Visualizing the extracted data__
 
