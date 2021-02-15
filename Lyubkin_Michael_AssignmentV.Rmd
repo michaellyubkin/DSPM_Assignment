@@ -297,6 +297,17 @@ ggplot() +
 
 ## __Exercise 6: Event locations in other countries__
 
+In exercise 6, I needed to repeat exercises 2-5, but for another country. I chose the Czech Republic. 
+For the solution of exercise 6, I could change the name of every object and therefore get all objects for the Czech Republic.
+
+However, all objects are names the same as in exercise 2 to exercise 5!
+
+The only adjustemnts that I have made were: 
+
+1. Setting the countryCode="CZ" for the first ``GET()`` request and the ``for`` loop.
+2. For the Czech Republic, I manually cut of the points where the longitude and latitude infromation that seemed to be wrong
+3. For the Map code, I changed the reghion from "Germany" to "Czech Republic".
+
 ```{r exercise_3}
 
 response <- GET("https://app.ticketmaster.com/discovery/v2/venues.json?",
